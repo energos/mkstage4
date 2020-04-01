@@ -114,9 +114,9 @@ fi
 # determines if filename was given with relative or absolute path
 if (($(grep -c '^/' <<< "$ARCHIVE") > 0))
 then
-	STAGE4_FILENAME="${ARCHIVE}.tar.bz2"
+	STAGE4_FILENAME="${ARCHIVE}"
 else
-	STAGE4_FILENAME="$(pwd)/${ARCHIVE}.tar.bz2"
+	STAGE4_FILENAME="$(pwd)/${ARCHIVE}"
 fi
 
 #Shifts pointer to read custom tar options
@@ -158,7 +158,7 @@ EXCLUDES+=("${USER_EXCL[@]}")
 
 if [ "$TARGET" == '/' ]
 then
-	EXCLUDES+=("--exclude=$(realpath "$STAGE4_FILENAME")")
+	EXCLUDES+=("--exclude=$(realpath "${STAGE4_FILENAME}.tar.bz2")")
 	if ((HAS_PORTAGEQ))
 	then
 		EXCLUDES+=("--exclude=$(portageq get_repo_path / gentoo)/*")
@@ -215,12 +215,12 @@ then
 	echo "example: \$ $(basename "$0") -s /my-backup --exclude=/etc/ssh/ssh_host*"
 	echo
 	echo "COMMAND LINE PREVIEW:"
-	echo 'tar' "${TAR_OPTIONS[@]}" "${EXCLUDES[@]}" "${OPTIONS[@]}" -f "$STAGE4_FILENAME" "${TARGET}"
+	echo 'tar' "${TAR_OPTIONS[@]}" "${EXCLUDES[@]}" "${OPTIONS[@]}" -f "${STAGE4_FILENAME}.tar.bz2" "${TARGET}"
 	if ((S_KERNEL))
 	then
 		echo
-		echo 'tar' "${TAR_OPTIONS[@]}" -f "$STAGE4_FILENAME.ksrc" "${TARGET}usr/src/linux-$(uname -r)"
-		echo 'tar' "${TAR_OPTIONS[@]}" -f "$STAGE4_FILENAME.kmod" "${TARGET}lib"*"/modules/$(uname -r)"
+		echo 'tar' "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.ksrc.tar.bz2" "${TARGET}usr/src/linux-$(uname -r)"
+		echo 'tar' "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.kmod.tar.bz2" "${TARGET}lib"*"/modules/$(uname -r)"
 	fi
 	echo
 	echo -n 'Type "yes" to continue or anything else to quit: '
@@ -230,10 +230,10 @@ fi
 # start stage4 creation:
 if [ "$AGREE" == 'yes' ]
 then
-	tar "${TAR_OPTIONS[@]}" "${EXCLUDES[@]}" "${OPTIONS[@]}" -f "$STAGE4_FILENAME" "${TARGET}"
+	tar "${TAR_OPTIONS[@]}" "${EXCLUDES[@]}" "${OPTIONS[@]}" -f "${STAGE4_FILENAME}.tar.bz2" "${TARGET}"
 	if ((S_KERNEL))
 	then
-		tar "${TAR_OPTIONS[@]}" -f "$STAGE4_FILENAME.ksrc" "${TARGET}usr/src/linux-$(uname -r)"
-		tar "${TAR_OPTIONS[@]}" -f "$STAGE4_FILENAME.kmod" "${TARGET}lib"*"/modules/$(uname -r)"
+		tar "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.ksrc.tar.bz2" "${TARGET}usr/src/linux-$(uname -r)"
+		tar "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.kmod.tar.bz2" "${TARGET}lib"*"/modules/$(uname -r)"
 	fi
 fi
