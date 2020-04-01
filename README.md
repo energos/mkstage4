@@ -6,6 +6,8 @@
 This is a Bash script to create stage 4 tarballs either for the running system, or a system at a specified mount point.
 The script was inspired by an earlier [mkstage4 script](https://github.com/gregf/bin/blob/master/mkstage4) by Greg Fitzgerald (unmaintained as of 2012) which itself was a revamped edition of the [original mkstage4](http://blinkeye.ch/dokuwiki/doku.php/projects/mkstage4) by Reto Glauser (unmaintaied as of 2009).
 
+This is a modified version forked from [TheChymera/mkstage4](https://github.com/TheChymera/mkstage4).
+
 More information on mkstage4 can be found on the following blogs, though instructions may be outdated compared to the current version, best documented by this `README` file:
 
 * English: [mkstage4 - Stage 4 Tarballs Made Easy](http://tutorials.chymera.eu/blog/2014/05/18/mkstage4-stage4-tarballs-made-easy/). 
@@ -97,6 +99,23 @@ tar -I pbzip2 -xvf archive_name.tar.bz2
 * **[pbzip2](https://launchpad.net/pbzip2)** (optional, if it is installed the archive can be compressed using multiple parallel threads) - in Portage as
 **app-arch/pbzip2**
 
+
+## Scratching my own itches
+
+Create Stage4:
+```bash
+/home/energos/bin/mkstage4.sh -p -l -H -k -s -c -e /home/energos/.urxvt -e /home/energos/.thumbnails -e /home/energos/.config/obmenu-generator/icons -e /home/energos/.emacs.d/elpa -e /home/Depot'*' /media/sf_Depot/Backup/GentooStage4/GentooStage4-20200331
+```
+To extract:
+```bash
+tar xpvf archive_name.tar.bz2 --xattrs-include='*.*' --numeric-owner
+```
+## Disclaimer:
+- Original code from [TheChymera/mkstage4](https://github.com/TheChymera/mkstage4) modified by [energos](https://github.com/energos/mkstage4).
+- These changes are likely to break BATS.
+- Kernel source and modules location detection may not work in some cases.
+- It works for me. Don't blame me if this script wipes all your beloved data.
+- As always, YMMV.
 
 ---
 Released under the GPLv3 license.
