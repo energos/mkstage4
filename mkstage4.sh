@@ -25,7 +25,7 @@ fi
 USAGE="usage:\n\
 	$(basename "$0") [-q -c -b -l -k -p] [-s || -t <target-mountpoint>] [-e <additional excludes dir*>] <archive-filename> [custom-tar-options]\n\
 	-q: activates quiet mode (no confirmation).\n\
-	-c: excludes some confidential files (currently only .bash_history and connman network lists).\n\
+	-c: excludes some confidential files.\n\
 	-b: excludes boot directory.\n\
 	-H: separately saves home directory.\n\
 	-l: excludes lost+found directory.\n\
@@ -156,6 +156,7 @@ EXCLUDES=(
 EXCLUDES_DEFAULT_PORTAGE=(
 	"--exclude=${TARGET}var/db/repos/gentoo/*"
 	"--exclude=${TARGET}var/cache/distfiles/*"
+	"--exclude=${TARGET}var/cache/binpkgs/*"
 	"--exclude=${TARGET}usr/portage/*"
 )
 
@@ -168,6 +169,8 @@ then
 	then
 		EXCLUDES+=("--exclude=$(portageq get_repo_path / gentoo)/*")
 		EXCLUDES+=("--exclude=$(portageq distdir)/*")
+		EXCLUDES+=("--exclude=$(portageq pkgdir)/*")
+	    EXCLUDES+=("--exclude=${TARGET}usr/portage/*")
 	else
 		EXCLUDES+=("${EXCLUDES_DEFAULT_PORTAGE[@]}")
 	fi
@@ -179,6 +182,10 @@ if ((EXCLUDE_CONFIDENTIAL))
 then
 	EXCLUDES+=("--exclude=${TARGET}home/*/.bash_history")
 	EXCLUDES+=("--exclude=${TARGET}root/.bash_history")
+	EXCLUDES+=("--exclude=${TARGET}home/*/.ssh/*")
+	EXCLUDES+=("--exclude=${TARGET}root/.ssh/*")
+	EXCLUDES+=("--exclude=${TARGET}home/*/.cache/*")
+	EXCLUDES+=("--exclude=${TARGET}root/.cache/*")
 	EXCLUDES+=("--exclude=${TARGET}var/lib/connman/*")
 fi
 
