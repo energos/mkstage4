@@ -218,9 +218,12 @@ then
 	echo 'tar' "${TAR_OPTIONS[@]}" "${EXCLUDES[@]}" "${OPTIONS[@]}" -f "${STAGE4_FILENAME}.tar.bz2" "${TARGET}"
 	if ((S_KERNEL))
 	then
+        kernelsource=$(readlink -f /lib/modules/$(uname -r)/source)
+        kernelsource="${kernelsource/\//}"
 		echo
-		echo 'tar' "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.ksrc.tar.bz2" "${TARGET}usr/src/linux-$(uname -r)"
-		echo 'tar' "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.kmod.tar.bz2" "${TARGET}lib"*"/modules/$(uname -r)"
+		echo 'tar' "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.ksrc.tar.bz2" "${TARGET}${kernelsource}"
+	    echo
+	    echo 'tar' "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.kmod.tar.bz2" "${TARGET}lib/modules/$(uname -r)"
 	fi
 	echo
 	echo -n 'Type "yes" to continue or anything else to quit: '
@@ -233,7 +236,9 @@ then
 	tar "${TAR_OPTIONS[@]}" "${EXCLUDES[@]}" "${OPTIONS[@]}" -f "${STAGE4_FILENAME}.tar.bz2" "${TARGET}"
 	if ((S_KERNEL))
 	then
-		tar "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.ksrc.tar.bz2" "${TARGET}usr/src/linux-$(uname -r)"
-		tar "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.kmod.tar.bz2" "${TARGET}lib"*"/modules/$(uname -r)"
+        kernelsource=$(readlink -f /lib/modules/$(uname -r)/source)
+        kernelsource="${kernelsource/\//}"
+		tar "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.ksrc.tar.bz2" "${TARGET}${kernelsource}"
+	    tar "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.kmod.tar.bz2" "${TARGET}lib/modules/$(uname -r)"
 	fi
 fi
