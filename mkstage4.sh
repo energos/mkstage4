@@ -170,7 +170,7 @@ then
 		EXCLUDES+=("--exclude=$(portageq get_repo_path / gentoo)/*")
 		EXCLUDES+=("--exclude=$(portageq distdir)/*")
 		EXCLUDES+=("--exclude=$(portageq pkgdir)/*")
-	    EXCLUDES+=("--exclude=${TARGET}usr/portage/*")
+		EXCLUDES+=("--exclude=${TARGET}usr/portage/*")
 	else
 		EXCLUDES+=("${EXCLUDES_DEFAULT_PORTAGE[@]}")
 	fi
@@ -199,7 +199,7 @@ then
 	EXCLUDE_HOME=("--exclude=${TARGET}home/*")
 	EXCLUDES+=("--exclude=$(realpath "${STAGE4_FILENAME}.home.tar.bz2")")
 else
-    EXCLUDE_HOME=("")
+	EXCLUDE_HOME=("")
 fi
 
 if ((EXCLUDE_LOST))
@@ -238,18 +238,18 @@ then
 	echo 'tar' "${TAR_OPTIONS[@]}" "${EXCLUDES[@]}" "${EXCLUDE_HOME[@]}" "${OPTIONS[@]}" -f "${STAGE4_FILENAME}.tar.bz2" "${TARGET}"
 	if ((S_KERNEL))
 	then
-        kernelsource=$(readlink -f /lib/modules/$(uname -r)/source)
-        kernelsource="${kernelsource/\//}"
+		kernelsource=$(readlink -f /lib/modules/$(uname -r)/source)
+		kernelsource="${kernelsource/\//}"
 		echo
 		echo 'tar' "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.ksrc.tar.bz2" "${TARGET}${kernelsource}"
-	    echo
-	    echo 'tar' "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.kmod.tar.bz2" "${TARGET}lib/modules/$(uname -r)"
+		echo
+		echo 'tar' "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.kmod.tar.bz2" "${TARGET}lib/modules/$(uname -r)"
 	fi
-    if ((S_HOME))
-    then
-        echo
-	    echo 'tar' "${TAR_OPTIONS[@]}" "${EXCLUDES[@]}" "${OPTIONS[@]}" -f "${STAGE4_FILENAME}.home.tar.bz2" "${TARGET}home"
-    fi
+	if ((S_HOME))
+	then
+		echo
+		echo 'tar' "${TAR_OPTIONS[@]}" "${EXCLUDES[@]}" "${OPTIONS[@]}" -f "${STAGE4_FILENAME}.home.tar.bz2" "${TARGET}home"
+	fi
 	echo
 	echo -n 'Type "yes" to continue or anything else to quit: '
 	read -r AGREE
@@ -261,13 +261,13 @@ then
 	tar "${TAR_OPTIONS[@]}" "${EXCLUDES[@]}" "${EXCLUDE_HOME[@]}" "${OPTIONS[@]}" -f "${STAGE4_FILENAME}.tar.bz2" "${TARGET}"
 	if ((S_KERNEL))
 	then
-        kernelsource=$(readlink -f /lib/modules/$(uname -r)/source)
-        kernelsource="${kernelsource/\//}"
+		kernelsource=$(readlink -f /lib/modules/$(uname -r)/source)
+		kernelsource="${kernelsource/\//}"
 		tar "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.ksrc.tar.bz2" "${TARGET}${kernelsource}"
-	    tar "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.kmod.tar.bz2" "${TARGET}lib/modules/$(uname -r)"
+		tar "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.kmod.tar.bz2" "${TARGET}lib/modules/$(uname -r)"
 	fi
-    if ((S_HOME))
-    then
-	    tar "${TAR_OPTIONS[@]}" "${EXCLUDES[@]}" "${OPTIONS[@]}" -f "${STAGE4_FILENAME}.home.tar.bz2" "${TARGET}home"
-    fi
+	if ((S_HOME))
+	then
+		tar "${TAR_OPTIONS[@]}" "${EXCLUDES[@]}" "${OPTIONS[@]}" -f "${STAGE4_FILENAME}.home.tar.bz2" "${TARGET}home"
+	fi
 fi
