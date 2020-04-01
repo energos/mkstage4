@@ -9,6 +9,7 @@ fi
 #set flag variables to null
 EXCLUDE_BOOT=0
 EXCLUDE_CONFIDENTIAL=0
+S_HOME=0
 EXCLUDE_LOST=0
 QUIET=0
 USER_EXCL=()
@@ -26,6 +27,7 @@ USAGE="usage:\n\
 	-q: activates quiet mode (no confirmation).\n\
 	-c: excludes some confidential files (currently only .bash_history and connman network lists).\n\
 	-b: excludes boot directory.\n\
+	-H: separately saves home directory.\n\
 	-l: excludes lost+found directory.\n\
 	-p: compresses parallelly using pbzip2.\n\
 	-e: an additional excludes directory (one dir one -e, donot use it with *).\n\
@@ -35,7 +37,7 @@ USAGE="usage:\n\
 	-h: displays help message."
 
 # reads options:
-while getopts ":t:e:skqcblph" flag
+while getopts ":t:e:skqcblHph" flag
 do
 	case "$flag" in
 		t)
@@ -58,6 +60,9 @@ do
 			;;
 		l)
 			EXCLUDE_LOST=1
+			;;
+		H)
+			S_HOME=1
 			;;
 		e)
 			USER_EXCL+=("--exclude=${OPTARG}")
@@ -182,6 +187,14 @@ then
 	EXCLUDES+=("--exclude=${TARGET}boot/*")
 fi
 
+if ((S_HOME))
+then
+	EXCLUDE_HOME=("--exclude=${TARGET}home/*")
+	EXCLUDES+=("--exclude=$(realpath "${STAGE4_FILENAME}.home.tar.bz2")")
+else
+    EXCLUDE_HOME=("")
+fi
+
 if ((EXCLUDE_LOST))
 then
 	EXCLUDES+=("--exclude=lost+found")
@@ -215,7 +228,7 @@ then
 	echo "example: \$ $(basename "$0") -s /my-backup --exclude=/etc/ssh/ssh_host*"
 	echo
 	echo "COMMAND LINE PREVIEW:"
-	echo 'tar' "${TAR_OPTIONS[@]}" "${EXCLUDES[@]}" "${OPTIONS[@]}" -f "${STAGE4_FILENAME}.tar.bz2" "${TARGET}"
+	echo 'tar' "${TAR_OPTIONS[@]}" "${EXCLUDES[@]}" "${EXCLUDE_HOME[@]}" "${OPTIONS[@]}" -f "${STAGE4_FILENAME}.tar.bz2" "${TARGET}"
 	if ((S_KERNEL))
 	then
         kernelsource=$(readlink -f /lib/modules/$(uname -r)/source)
@@ -225,6 +238,11 @@ then
 	    echo
 	    echo 'tar' "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.kmod.tar.bz2" "${TARGET}lib/modules/$(uname -r)"
 	fi
+    if ((S_HOME))
+    then
+        echo
+	    echo 'tar' "${TAR_OPTIONS[@]}" "${EXCLUDES[@]}" "${OPTIONS[@]}" -f "${STAGE4_FILENAME}.home.tar.bz2" "${TARGET}home"
+    fi
 	echo
 	echo -n 'Type "yes" to continue or anything else to quit: '
 	read -r AGREE
@@ -233,7 +251,7 @@ fi
 # start stage4 creation:
 if [ "$AGREE" == 'yes' ]
 then
-	tar "${TAR_OPTIONS[@]}" "${EXCLUDES[@]}" "${OPTIONS[@]}" -f "${STAGE4_FILENAME}.tar.bz2" "${TARGET}"
+	tar "${TAR_OPTIONS[@]}" "${EXCLUDES[@]}" "${EXCLUDE_HOME[@]}" "${OPTIONS[@]}" -f "${STAGE4_FILENAME}.tar.bz2" "${TARGET}"
 	if ((S_KERNEL))
 	then
         kernelsource=$(readlink -f /lib/modules/$(uname -r)/source)
@@ -241,4 +259,8 @@ then
 		tar "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.ksrc.tar.bz2" "${TARGET}${kernelsource}"
 	    tar "${TAR_OPTIONS[@]}" -f "${STAGE4_FILENAME}.kmod.tar.bz2" "${TARGET}lib/modules/$(uname -r)"
 	fi
+    if ((S_HOME))
+    then
+	    tar "${TAR_OPTIONS[@]}" "${EXCLUDES[@]}" "${OPTIONS[@]}" -f "${STAGE4_FILENAME}.home.tar.bz2" "${TARGET}home"
+    fi
 fi
